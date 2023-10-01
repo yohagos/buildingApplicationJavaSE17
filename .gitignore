@@ -40,3 +40,4 @@ build/
 ### Own excludes ###
 .idea
 /.idea
+courses.db.mv.db
