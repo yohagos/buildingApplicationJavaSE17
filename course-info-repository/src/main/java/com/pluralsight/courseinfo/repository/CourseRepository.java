@@ -8,4 +8,8 @@ public interface CourseRepository {
     void saveCourse(Course course);
 
     List<Course> getAllCourses();
+
+    static CourseRepository openRepository(String databaseFile) {
+        return new CourseJdbcRepository(databaseFile);
+    }
 }
