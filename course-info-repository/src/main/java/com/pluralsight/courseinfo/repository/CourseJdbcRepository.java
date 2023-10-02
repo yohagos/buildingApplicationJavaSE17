@@ -14,11 +14,17 @@ class CourseJdbcRepository implements CourseRepository{
 
     private static final String H2_DATABASE_URL =
             "jdbc:h2:file:%s;AUTO_SERVER=TRUE;INIT=RUNSCRIPT FROM './db_init.sql'";
-    private static final String GET_ALL = "SELECT * FROM COURSES";
+
     private static final String INSERT_COURSE = """
             MERGE INTO Courses (id, name, length, url)
-            VALUES (?,?,?,?)
+            VALUES (?, ?, ?, ?)
             """;
+
+    private static final String ADD_NOTES = """
+            UPDATE COURSES SET notes = ?
+            WHERE id = ?
+            """;
+
     private final DataSource dataSource;
 
     public CourseJdbcRepository(String databaseFile) {
@@ -52,20 +58,34 @@ class CourseJdbcRepository implements CourseRepository{
             }
             return courses;*/
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(GET_ALL);
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Courses");
+            System.out.println(resultSet);
             List<Course> courses = new ArrayList<>();
             while(resultSet.next()){
                 Course course = new Course(
                         resultSet.getString(1),
                         resultSet.getString(2),
                         resultSet.getLong(3),
-                        resultSet.getString(4)
+                        resultSet.getString(4),
+                        Optional.ofNullable(resultSet.getString(5))
                 );
                 courses.add(course);
             }
             return Collections.unmodifiableList(courses);
         } catch (SQLException e) {
             throw new RepositoryException("Failed to retrieve courses : ", e);
+        }
+    }
+
+    @Override
+     public void addNotes(String id, String notes) {
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(ADD_NOTES);
+            preparedStatement.setString(1, notes);
+            preparedStatement.setString(2, id);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new RepositoryException("Failed to add notes " + notes + " to " + id, e);
         }
     }
 }

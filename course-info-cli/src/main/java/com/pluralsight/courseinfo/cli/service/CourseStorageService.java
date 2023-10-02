@@ -20,7 +20,8 @@ public class CourseStorageService {
                     psCourse.id(),
                     psCourse.title(),
                     psCourse.durationToMinutes(),
-                    (PS_BASE_URL + psCourse.contentUrl())
+                    (PS_BASE_URL + psCourse.contentUrl()),
+                    Optional.empty()
             );
             courseRepository.saveCourse(course);
         }

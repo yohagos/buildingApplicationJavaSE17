@@ -22,7 +22,7 @@ class CourseStorageServiceTest {
         );
         courseStorageService.storePluralsightCourses(List.of(ps1));
 
-        Course expected = new Course("1", "title", 65, "https://app.pluralsight.com/url");
+        Course expected = new Course("1", "title", 65, "https://app.pluralsight.com/url", Optional.empty());
         assertEquals(List.of(expected), repository.getAllCourses());
     }
 
@@ -36,6 +36,11 @@ class CourseStorageServiceTest {
         @Override
         public List<Course> getAllCourses() {
             return courses;
+        }
+
+        @Override
+        public void addNotes(String id, String notes) {
+            throw new UnsupportedOperationException();
         }
     }
 }
